@@ -1,10 +1,16 @@
 # NAME
 
-Contextual::Diag - It's new $module
+Contextual::Diag - diagnose contexts
 
 # SYNOPSIS
 
     use Contextual::Diag;
+
+    if (whatcontext) { }
+    # => evaluated as BOOL in SCALAR context
+
+    my $h = { key => whatcontext 'hello' };
+    # => wanted LIST context
 
 # DESCRIPTION
 

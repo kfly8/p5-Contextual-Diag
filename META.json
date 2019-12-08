@@ -1,5 +1,5 @@
 {
-   "abstract" : "It's new $module",
+   "abstract" : "diagnose contexts",
    "author" : [
       "kfly8 <kfly@cpan.org>"
    ],
@@ -42,12 +42,15 @@
       },
       "runtime" : {
          "requires" : {
+            "Carp" : "0",
+            "Contextual::Return" : "0",
+            "Exporter" : "0",
             "perl" : "5.008001"
          }
       },
       "test" : {
          "requires" : {
-            "Test::More" : "0.98"
+            "Test2" : "1.302014"
          }
       }
    },
