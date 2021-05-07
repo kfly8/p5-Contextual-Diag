@@ -45,7 +45,7 @@
             "Carp" : "0",
             "Contextual::Return" : "0.004014",
             "Exporter" : "0",
-            "perl" : "5.008001"
+            "perl" : "5.010001"
          }
       },
       "test" : {

@@ -1,4 +1,4 @@
-requires 'perl', '5.008001';
+requires 'perl', '5.010001';
 
 requires 'Exporter';
 requires 'Contextual::Return', '0.004014';
