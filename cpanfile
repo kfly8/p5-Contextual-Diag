@@ -9,6 +9,6 @@ on 'configure' => sub {
 };
 
 on 'test' => sub {
-    requires 'Test2', '1.302014';
+    requires 'Test2::V0', '0.000135';
 };
 
