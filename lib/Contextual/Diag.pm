@@ -55,17 +55,33 @@ Contextual::Diag - diagnose contexts
 
 =head1 SYNOPSIS
 
-    use Contextual::Diag;
+    use Contextual::Diag qw(whatcontext);
 
     if (whatcontext) { }
-    # => evaluated as BOOL in SCALAR context
+    # => warn "evaluated as BOOL in SCALAR context"
 
     my $h = { key => whatcontext 'hello' };
-    # => wanted LIST context
+    # => warn "wanted LIST context"
 
 =head1 DESCRIPTION
 
-Contextual::Diag is ...
+Contextual::Diag explains how contexts are evaluated in Perl,
+and is intended to help newcomers to the language learn,
+since Perl contexts are a unique feature of the language.
+
+=head1 FUNCTIONS
+
+=head2 whatcontext
+
+By plugging in the context where you want to know, indicate what the context:
+
+    # CASE: wanted LIST context
+    my @t = whatcontext qw/a b/
+    my @t = ('a','b', whatcontext())
+
+    # CASE: wanted SCALAR context
+    my $t = whatcontext "hello"
+    scalar whatcontext qw/a b/
 
 =head1 LICENSE
 

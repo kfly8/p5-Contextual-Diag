@@ -14,6 +14,7 @@ subtest 'LIST context' => sub {
         qr/^wanted LIST context/,
     ];
     like( warnings { my @t = whatcontext }, $expected );
+    like( warnings { my @t = whatcontext qw/a b/ }, $expected );
     like( warnings { my %t = whatcontext }, $expected, 'Assignment LIST as HASH' );
     like( warnings { for(whatcontext()) { } }, $expected, 'for statement' );
     like( warnings { my @t = ('a','b', whatcontext()) }, $expected, 'list elements' );
@@ -30,6 +31,7 @@ subtest 'SCALAR context' => sub {
     ];
     like( warnings { my $t = whatcontext }, $expected );
     like( warnings { scalar whatcontext() }, $expected );
+    like( warnings { scalar whatcontext qw/a b/ }, $expected );
 };
 
 subtest 'SCALAR as BOOL' => sub {
