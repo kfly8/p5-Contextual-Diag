@@ -21,9 +21,11 @@ Contextual::Diag explains how contexts are evaluated in Perl,
 and is intended to help newcomers to the language learn,
 since Perl contexts are a unique feature of the language.
 
-# FUNCTIONS
+## whatcontext()
 
-## whatcontext
+```perl
+whatcontext(@_) => @_
+```
 
 By plugging in the context where you want to know, indicate what the context:
 
