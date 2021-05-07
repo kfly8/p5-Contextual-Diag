@@ -2,184 +2,125 @@ use Test2::V0;
 
 use Contextual::Diag;
 
-like(
-    warnings { if (whatcontext) {} },
-    [
+subtest 'VOID context' => sub {
+    my $expected = [
+        qr/^wanted VOID context/,
+    ];
+    like( warnings { whatcontext }, $expected );
+};
+
+subtest 'LIST context' => sub {
+    my $expected = [
+        qr/^wanted LIST context/,
+    ];
+    like( warnings { my @t = whatcontext }, $expected );
+    like( warnings { my %t = whatcontext }, $expected, 'Assignment LIST as HASH' );
+    like( warnings { for(whatcontext()) { } }, $expected, 'for statement' );
+    like( warnings { my @t = ('a','b', whatcontext()) }, $expected, 'list elements' );
+    like( warnings { my %h = (key => whatcontext('a')) }, $expected, 'hash value' );
+    like( warnings { my $h = {key => whatcontext('a')} }, $expected, 'hashref value' );
+    like( warnings { (sub {})->(whatcontext()) }, $expected, 'sub arguments' );
+    like( warnings { sort(whatcontext()) }, $expected, 'sort function' );
+    like( warnings { my ($t) = whatcontext }, $expected, 'assignment LIST as list' );
+};
+
+subtest 'SCALAR context' => sub {
+    my $expected = [
+        qr/^wanted SCALAR context/,
+    ];
+    like( warnings { my $t = whatcontext }, $expected );
+    like( warnings { scalar whatcontext() }, $expected );
+};
+
+subtest 'SCALAR as BOOL' => sub {
+    my $expected = [
         qr/^wanted SCALAR context/,
         qr/^evaluated as BOOL in SCALAR context/,
-    ],
-    "BOOL"
-);
+    ];
+    like( warnings { if (whatcontext) {} }, $expected );
+};
 
-like(
-    warnings { if ("hello" eq whatcontext) { } },
-    [
+subtest 'SCALAR as STR' => sub {
+    my $expected = [
         qr/^wanted SCALAR context/,
         qr/^evaluated as STR in SCALAR context/,
-    ],
-    "STR"
-);
+    ];
 
-like(
-    warnings { if (0 == whatcontext) { } },
-    [
+    like( warnings { ok "hello" ne whatcontext }, $expected );
+    like( warnings { ok "hello" eq whatcontext "hello" }, $expected );
+    like( warnings { length whatcontext() }, $expected );
+};
+
+subtest 'SCALAR as NUM' => sub {
+    my $expected = [
         qr/^wanted SCALAR context/,
         qr/^evaluated as NUM in SCALAR context/,
-    ],
-    "NUM"
-);
+    ];
 
-like(
-    warning { my $t = whatcontext },
-    qr/^wanted SCALAR context/,
-    "Assignment SCALAR"
-);
+    like( warnings { ok 1 != whatcontext }, $expected );
+    like( warnings { ok 1 == whatcontext 1 }, $expected );
+};
 
-like(
-    warning { my @t = whatcontext },
-    qr/^wanted LIST context/,
-    "Assignment LIST as ARRAY"
-);
-
-like(
-    warning { my %t = whatcontext },
-    qr/^wanted LIST context/,
-    "Assignment LIST as HASH"
-);
-
-like(
-    warning { whatcontext },
-    qr/^wanted VOID context/,
-    "VOID context"
-);
-
-like(
-    warnings { my $t = ${whatcontext()} },
-    [
+subtest 'evaluated as SCALARREF' => sub {
+    my $expected = [
         qr/^wanted SCALAR context/,
         qr/^scalar ref is evaluated as SCALARREF/,
-    ],
-    "evaluated as SCALARREF"
-);
+    ];
+    like( warnings { my $t = ${whatcontext()} }, $expected );
+    like( warnings { my $t = ${whatcontext(\"hoge")} }, $expected );
+};
 
-like(
-    warnings { my @t = @{whatcontext()} },
-    [
+subtest 'evaluated as ARRAYREF' => sub {
+    my $expected = [
         qr/^wanted SCALAR context/,
         qr/^scalar ref is evaluated as ARRAYREF/,
-    ],
-    "evaluated as ARRAYREF"
-);
+    ];
+    like( warnings { my $t = @{whatcontext()} }, $expected );
+    like( warnings { my $t = @{whatcontext(["a"])} }, $expected );
+    like( warnings { whatcontext()->[0] }, $expected, 'access to element of arrrayref' );
+};
 
-like(
-    warnings { my %t = %{whatcontext()} },
-    [
+subtest 'evaluated as HASHREF' => sub {
+    my $expected = [
         qr/^wanted SCALAR context/,
         qr/^scalar ref is evaluated as HASHREF/,
-    ],
-    "evaluated as ARRAYREF"
-);
+    ];
+    like( warnings { my $t = %{whatcontext()} }, $expected );
+    like( warnings { my $t = %{whatcontext({"key" => "value"})} }, $expected );
+    like( warnings { whatcontext()->{somekey} }, $expected, 'access to element of hashref' );
+};
 
-like(
-    warnings { *{whatcontext()}->{CODE} },
-    [
+subtest 'evaluated as GLOBREF' => sub {
+    my $expected = [
         qr/^wanted SCALAR context/,
         qr/^scalar ref is evaluated as GLOBREF/,
-    ],
-    "evaluated as GLOBREF"
-);
+    ];
+    my $globref = do {
+        no strict qw(refs);
+        my $package = __PACKAGE__;
+        \*{$package};
+    };
+    like( warnings { *{whatcontext()}->{CODE} }, $expected );
+    like( warnings { *{whatcontext($globref)}->{CODE} }, $expected );
+};
 
-like(
-    warnings { whatcontext()->[0] },
-    [
-        qr/^wanted SCALAR context/,
-        qr/^scalar ref is evaluated as ARRAYREF/,
-    ],
-    "evaluated as ARRAYREF when access to element"
-);
-
-like(
-    warnings { whatcontext()->{somekey} },
-    [
-        qr/^wanted SCALAR context/,
-        qr/^scalar ref is evaluated as HASHREF/,
-    ],
-    "evaluated as HASHREF when access to element"
-);
-
-like(
-    warnings { whatcontext()->() },
-    [
+subtest 'evaluated as CODEREF' => sub {
+    my $expected = [
         qr/^wanted SCALAR context/,
         qr/^scalar ref is evaluated as CODEREF/,
-    ],
-    "evaluated as CODEREF"
-);
+    ];
+    like( warnings { whatcontext()->() }, $expected );
+    like( warnings { whatcontext(sub {})->() }, $expected );
+};
 
-like(
-    warnings { whatcontext()->can('somemethod') },
-    [
+subtest 'evaluated as OBJREF' => sub {
+    my $expected = [
         qr/^wanted SCALAR context/,
         qr/^scalar ref is evaluated as OBJREF/,
-    ],
-    "evaluated as OBJREF"
-);
-
-like(
-    warning { for(whatcontext()) { } },
-    qr/^wanted LIST context/,
-    "for statement"
-);
-
-like(
-    warning { my @t = ('a','b', whatcontext()) },
-    qr/^wanted LIST context/,
-    "list elements"
-);
-
-like(
-    warning { my %h = (key => whatcontext('a')) },
-    qr/^wanted LIST context/,
-    "hash elements"
-);
-
-like(
-    warning { my $h = {key => whatcontext('a')} },
-    qr/^wanted LIST context/,
-    "hash ref elements"
-);
-
-like(
-    warning { (sub {})->(whatcontext()) },
-    qr/^wanted LIST context/,
-    "sub args"
-);
-
-like(
-    warning { sort(whatcontext()) },
-    qr/^wanted LIST context/,
-    "sort function"
-);
-
-like(
-    warnings { length whatcontext() },
-    [
-        qr/^wanted SCALAR context/,
-        qr/^evaluated as STR in SCALAR context/,
-    ],
-    "length"
-);
-
-like(
-    warning { my ($t) = whatcontext },
-    qr/^wanted LIST context/,
-    "Assignment LIST as list"
-);
-
-like(
-    warning { my @t = scalar whatcontext(); },
-    qr/^wanted SCALAR context/,
-    "force scalar context"
-);
+    ];
+    my $obj = bless {}, 'Some';
+    like( warnings { whatcontext()->can('somemethod') }, $expected );
+    like( warnings { whatcontext($obj)->can('somemethod') }, $expected );
+};
 
 done_testing;
