@@ -34,7 +34,7 @@ sub whatcontext {
         ARRAYREF  { _carp('scalar ref is evaluated as ARRAYREF');  defined $_[0] ? $_[0] : [] }
         HASHREF   { _carp('scalar ref is evaluated as HASHREF');   defined $_[0] ? $_[0] : {} }
         CODEREF   { _carp('scalar ref is evaluated as CODEREF');   defined $_[0] ? $_[0] : sub { } }
-        GLOBREF   { _carp('scalar ref is evaluated as GLOBREF');   defined $_[0] ? $_[0] : do { no strict qw/refs/; \*{__PACKAGE__()} } }
+        GLOBREF   { _carp('scalar ref is evaluated as GLOBREF');   defined $_[0] ? $_[0] : do { no strict qw/refs/; my $package = __PACKAGE__; \*{$package} } }
         OBJREF    { _carp('scalar ref is evaluated as OBJREF');    defined $_[0] ? $_[0] : bless {}, __PACKAGE__ }
     ;
 }
