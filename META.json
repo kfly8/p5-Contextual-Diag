@@ -1,5 +1,5 @@
 {
-   "abstract" : "diagnose contexts",
+   "abstract" : "diagnosing perl context",
    "author" : [
       "kfly8 <kfly@cpan.org>"
    ],

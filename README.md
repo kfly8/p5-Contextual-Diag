@@ -1,42 +1,41 @@
 [![Actions Status](https://github.com/kfly8/p5-Contextual-Diag/workflows/test/badge.svg)](https://github.com/kfly8/p5-Contextual-Diag/actions) [![Coverage Status](https://img.shields.io/coveralls/kfly8/p5-Contextual-Diag/master.svg?style=flat)](https://coveralls.io/r/kfly8/p5-Contextual-Diag?branch=master) [![MetaCPAN Release](https://badge.fury.io/pl/Contextual-Diag.svg)](https://metacpan.org/release/Contextual-Diag)
 # NAME
 
-Contextual::Diag - diagnose contexts
+Contextual::Diag - diagnosing perl context
 
 # SYNOPSIS
 
 ```perl
-use Contextual::Diag qw(whatcontext);
+use Contextual::Diag;
 
-if (whatcontext) { }
+if (contexual_diag) { }
 # => warn "evaluated as BOOL in SCALAR context"
 
-my $h = { key => whatcontext 'hello' };
+my $h = { key => contexual_diag 'hello' };
 # => warn "wanted LIST context"
 ```
 
 # DESCRIPTION
 
-Contextual::Diag explains how contexts are evaluated in Perl,
-and is intended to help newcomers to the language learn,
-since Perl contexts are a unique feature of the language.
+Contextual::Diag is a tool for diagnosing perl context.
+The purpose of this module is to make it easier to learn perl context.
 
-## whatcontext()
+## contexual\_diag()
 
 ```perl
-whatcontext(@_) => @_
+contexual_diag(@_) => @_
 ```
 
 By plugging in the context where you want to know, indicate what the context:
 
 ```perl
 # CASE: wanted LIST context
-my @t = whatcontext qw/a b/
-my @t = ('a','b', whatcontext())
+my @t = contexual_diag qw/a b/
+my @t = ('a','b', contexual_diag())
 
 # CASE: wanted SCALAR context
-my $t = whatcontext "hello"
-scalar whatcontext qw/a b/
+my $t = contexual_diag "hello"
+scalar contexual_diag qw/a b/
 ```
 
 # LICENSE
