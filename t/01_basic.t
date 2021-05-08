@@ -6,32 +6,32 @@ subtest 'VOID context' => sub {
     my $expected = [
         qr/^wanted VOID context/,
     ];
-    like( warnings { contexual_diag }, $expected );
+    like( warnings { contextual_diag }, $expected );
 };
 
 subtest 'LIST context' => sub {
     my $expected = [
         qr/^wanted LIST context/,
     ];
-    like( warnings { my @t = contexual_diag }, $expected );
-    like( warnings { my @t = contexual_diag qw/a b/ }, $expected );
-    like( warnings { my %t = contexual_diag }, $expected, 'Assignment LIST as HASH' );
-    like( warnings { for(contexual_diag()) { } }, $expected, 'for statement' );
-    like( warnings { my @t = ('a','b', contexual_diag()) }, $expected, 'list elements' );
-    like( warnings { my %h = (key => contexual_diag('a')) }, $expected, 'hash value' );
-    like( warnings { my $h = {key => contexual_diag('a')} }, $expected, 'hashref value' );
-    like( warnings { (sub {})->(contexual_diag()) }, $expected, 'sub arguments' );
-    like( warnings { sort(contexual_diag()) }, $expected, 'sort function' );
-    like( warnings { my ($t) = contexual_diag }, $expected, 'assignment LIST as list' );
+    like( warnings { my @t = contextual_diag }, $expected );
+    like( warnings { my @t = contextual_diag qw/a b/ }, $expected );
+    like( warnings { my %t = contextual_diag }, $expected, 'Assignment LIST as HASH' );
+    like( warnings { for(contextual_diag()) { } }, $expected, 'for statement' );
+    like( warnings { my @t = ('a','b', contextual_diag()) }, $expected, 'list elements' );
+    like( warnings { my %h = (key => contextual_diag('a')) }, $expected, 'hash value' );
+    like( warnings { my $h = {key => contextual_diag('a')} }, $expected, 'hashref value' );
+    like( warnings { (sub {})->(contextual_diag()) }, $expected, 'sub arguments' );
+    like( warnings { sort(contextual_diag()) }, $expected, 'sort function' );
+    like( warnings { my ($t) = contextual_diag }, $expected, 'assignment LIST as list' );
 };
 
 subtest 'SCALAR context' => sub {
     my $expected = [
         qr/^wanted SCALAR context/,
     ];
-    like( warnings { my $t = contexual_diag }, $expected );
-    like( warnings { scalar contexual_diag() }, $expected );
-    like( warnings { scalar contexual_diag qw/a b/ }, $expected );
+    like( warnings { my $t = contextual_diag }, $expected );
+    like( warnings { scalar contextual_diag() }, $expected );
+    like( warnings { scalar contextual_diag qw/a b/ }, $expected );
 };
 
 subtest 'SCALAR as BOOL' => sub {
@@ -39,7 +39,7 @@ subtest 'SCALAR as BOOL' => sub {
         qr/^wanted SCALAR context/,
         qr/^evaluated as BOOL in SCALAR context/,
     ];
-    like( warnings { if (contexual_diag) {} }, $expected );
+    like( warnings { if (contextual_diag) {} }, $expected );
 };
 
 subtest 'SCALAR as STR' => sub {
@@ -48,9 +48,9 @@ subtest 'SCALAR as STR' => sub {
         qr/^evaluated as STR in SCALAR context/,
     ];
 
-    like( warnings { ok "hello" ne contexual_diag }, $expected );
-    like( warnings { ok "hello" eq contexual_diag "hello" }, $expected );
-    like( warnings { length contexual_diag() }, $expected );
+    like( warnings { ok "hello" ne contextual_diag }, $expected );
+    like( warnings { ok "hello" eq contextual_diag "hello" }, $expected );
+    like( warnings { length contextual_diag() }, $expected );
 };
 
 subtest 'SCALAR as NUM' => sub {
@@ -59,8 +59,8 @@ subtest 'SCALAR as NUM' => sub {
         qr/^evaluated as NUM in SCALAR context/,
     ];
 
-    like( warnings { ok 1 != contexual_diag }, $expected );
-    like( warnings { ok 1 == contexual_diag 1 }, $expected );
+    like( warnings { ok 1 != contextual_diag }, $expected );
+    like( warnings { ok 1 == contextual_diag 1 }, $expected );
 };
 
 subtest 'evaluated as SCALARREF' => sub {
@@ -68,8 +68,8 @@ subtest 'evaluated as SCALARREF' => sub {
         qr/^wanted SCALAR context/,
         qr/^scalar ref is evaluated as SCALARREF/,
     ];
-    like( warnings { my $t = ${contexual_diag()} }, $expected );
-    like( warnings { my $t = ${contexual_diag(\"hoge")} }, $expected );
+    like( warnings { my $t = ${contextual_diag()} }, $expected );
+    like( warnings { my $t = ${contextual_diag(\"hoge")} }, $expected );
 };
 
 subtest 'evaluated as ARRAYREF' => sub {
@@ -77,9 +77,9 @@ subtest 'evaluated as ARRAYREF' => sub {
         qr/^wanted SCALAR context/,
         qr/^scalar ref is evaluated as ARRAYREF/,
     ];
-    like( warnings { my $t = @{contexual_diag()} }, $expected );
-    like( warnings { my $t = @{contexual_diag(["a"])} }, $expected );
-    like( warnings { contexual_diag()->[0] }, $expected, 'access to element of arrrayref' );
+    like( warnings { my $t = @{contextual_diag()} }, $expected );
+    like( warnings { my $t = @{contextual_diag(["a"])} }, $expected );
+    like( warnings { contextual_diag()->[0] }, $expected, 'access to element of arrrayref' );
 };
 
 subtest 'evaluated as HASHREF' => sub {
@@ -87,9 +87,9 @@ subtest 'evaluated as HASHREF' => sub {
         qr/^wanted SCALAR context/,
         qr/^scalar ref is evaluated as HASHREF/,
     ];
-    like( warnings { my $t = %{contexual_diag()} }, $expected );
-    like( warnings { my $t = %{contexual_diag({"key" => "value"})} }, $expected );
-    like( warnings { contexual_diag()->{somekey} }, $expected, 'access to element of hashref' );
+    like( warnings { my $t = %{contextual_diag()} }, $expected );
+    like( warnings { my $t = %{contextual_diag({"key" => "value"})} }, $expected );
+    like( warnings { contextual_diag()->{somekey} }, $expected, 'access to element of hashref' );
 };
 
 subtest 'evaluated as GLOBREF' => sub {
@@ -102,8 +102,8 @@ subtest 'evaluated as GLOBREF' => sub {
         my $package = __PACKAGE__;
         \*{$package};
     };
-    like( warnings { *{contexual_diag()}->{CODE} }, $expected );
-    like( warnings { *{contexual_diag($globref)}->{CODE} }, $expected );
+    like( warnings { *{contextual_diag()}->{CODE} }, $expected );
+    like( warnings { *{contextual_diag($globref)}->{CODE} }, $expected );
 };
 
 subtest 'evaluated as CODEREF' => sub {
@@ -111,8 +111,8 @@ subtest 'evaluated as CODEREF' => sub {
         qr/^wanted SCALAR context/,
         qr/^scalar ref is evaluated as CODEREF/,
     ];
-    like( warnings { contexual_diag()->() }, $expected );
-    like( warnings { contexual_diag(sub {})->() }, $expected );
+    like( warnings { contextual_diag()->() }, $expected );
+    like( warnings { contextual_diag(sub {})->() }, $expected );
 };
 
 subtest 'evaluated as OBJREF' => sub {
@@ -121,8 +121,8 @@ subtest 'evaluated as OBJREF' => sub {
         qr/^scalar ref is evaluated as OBJREF/,
     ];
     my $obj = bless {}, 'Some';
-    like( warnings { contexual_diag()->can('somemethod') }, $expected );
-    like( warnings { contexual_diag($obj)->can('somemethod') }, $expected );
+    like( warnings { contextual_diag()->can('somemethod') }, $expected );
+    like( warnings { contextual_diag($obj)->can('somemethod') }, $expected );
 };
 
 done_testing;
