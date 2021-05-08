@@ -7,41 +7,41 @@ our $VERSION = "0.01";
 
 use Exporter;
 our @ISA = qw/Exporter/;
-our @EXPORT = qw/whatcontext/;
+our @EXPORT = qw/contexual_diag/;
 
 use Contextual::Return;
-use Carp qw/carp/;
+use Carp ();
 
-
-sub whatcontext {
+sub contexual_diag {
 
     # XXX: SCALAR block is lazy.
+    # https://metacpan.org/pod/Contextual%3A%3AReturn#Lazy-contextual-return-values
     if (defined wantarray && !wantarray) {
-        _carp('wanted SCALAR context');
+        _diag('wanted SCALAR context');
     }
 
     return
-        VOID     { _carp('wanted VOID context'); @_ }
-        LIST     { _carp('wanted LIST context'); @_ }
+        VOID     { _diag('wanted VOID context'); @_ }
+        LIST     { _diag('wanted LIST context'); @_ }
 
         # Scalar Value
-        BOOL     { _carp('evaluated as BOOL in SCALAR context'); $_[0] }
-        NUM      { _carp('evaluated as NUM in SCALAR context');  $_[0] || 0   }
-        STR      { _carp('evaluated as STR in SCALAR context');  $_[0] || ""  }
+        BOOL     { _diag('evaluated as BOOL in SCALAR context'); $_[0] }
+        NUM      { _diag('evaluated as NUM in SCALAR context');  $_[0] || 0   }
+        STR      { _diag('evaluated as STR in SCALAR context');  $_[0] || ""  }
 
         # Scalar Reference
-        SCALARREF { _carp('scalar ref is evaluated as SCALARREF'); defined $_[0] ? $_[0] : \"" }
-        ARRAYREF  { _carp('scalar ref is evaluated as ARRAYREF');  defined $_[0] ? $_[0] : [] }
-        HASHREF   { _carp('scalar ref is evaluated as HASHREF');   defined $_[0] ? $_[0] : {} }
-        CODEREF   { _carp('scalar ref is evaluated as CODEREF');   defined $_[0] ? $_[0] : sub { } }
-        GLOBREF   { _carp('scalar ref is evaluated as GLOBREF');   defined $_[0] ? $_[0] : do { no strict qw/refs/; my $package = __PACKAGE__; \*{$package} } }
-        OBJREF    { _carp('scalar ref is evaluated as OBJREF');    defined $_[0] ? $_[0] : bless {}, __PACKAGE__ }
+        SCALARREF { _diag('scalar ref is evaluated as SCALARREF'); defined $_[0] ? $_[0] : \"" }
+        ARRAYREF  { _diag('scalar ref is evaluated as ARRAYREF');  defined $_[0] ? $_[0] : [] }
+        HASHREF   { _diag('scalar ref is evaluated as HASHREF');   defined $_[0] ? $_[0] : {} }
+        CODEREF   { _diag('scalar ref is evaluated as CODEREF');   defined $_[0] ? $_[0] : sub { } }
+        GLOBREF   { _diag('scalar ref is evaluated as GLOBREF');   defined $_[0] ? $_[0] : do { no strict qw/refs/; my $package = __PACKAGE__; \*{$package} } }
+        OBJREF    { _diag('scalar ref is evaluated as OBJREF');    defined $_[0] ? $_[0] : bless {}, __PACKAGE__ }
     ;
 }
 
-sub _carp {
+sub _diag {
     local $Carp::CarpLevel = 2;
-    carp @_;
+    goto &Carp::carp;
 }
 
 1;
@@ -51,37 +51,36 @@ __END__
 
 =head1 NAME
 
-Contextual::Diag - diagnose contexts
+Contextual::Diag - diagnosing perl context
 
 =head1 SYNOPSIS
 
-    use Contextual::Diag qw(whatcontext);
+    use Contextual::Diag;
 
-    if (whatcontext) { }
+    if (contexual_diag) { }
     # => warn "evaluated as BOOL in SCALAR context"
 
-    my $h = { key => whatcontext 'hello' };
+    my $h = { key => contexual_diag 'hello' };
     # => warn "wanted LIST context"
 
 =head1 DESCRIPTION
 
-Contextual::Diag explains how contexts are evaluated in Perl,
-and is intended to help newcomers to the language learn,
-since Perl contexts are a unique feature of the language.
+Contextual::Diag is a tool for diagnosing perl context.
+The purpose of this module is to make it easier to learn perl context.
 
-=head2 whatcontext()
+=head2 contexual_diag()
 
-    whatcontext(@_) => @_
+    contexual_diag(@_) => @_
 
 By plugging in the context where you want to know, indicate what the context:
 
     # CASE: wanted LIST context
-    my @t = whatcontext qw/a b/
-    my @t = ('a','b', whatcontext())
+    my @t = contexual_diag qw/a b/
+    my @t = ('a','b', contexual_diag())
 
     # CASE: wanted SCALAR context
-    my $t = whatcontext "hello"
-    scalar whatcontext qw/a b/
+    my $t = contexual_diag "hello"
+    scalar contexual_diag qw/a b/
 
 =head1 LICENSE
 
