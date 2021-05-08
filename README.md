@@ -8,10 +8,10 @@ Contextual::Diag - diagnosing perl context
 ```perl
 use Contextual::Diag;
 
-if (contexual_diag) { }
+if (contextual_diag) { }
 # => warn "evaluated as BOOL in SCALAR context"
 
-my $h = { key => contexual_diag 'hello' };
+my $h = { key => contextual_diag 'hello' };
 # => warn "wanted LIST context"
 ```
 
@@ -20,22 +20,22 @@ my $h = { key => contexual_diag 'hello' };
 Contextual::Diag is a tool for diagnosing perl context.
 The purpose of this module is to make it easier to learn perl context.
 
-## contexual\_diag()
+## contextual\_diag()
 
 ```perl
-contexual_diag(@_) => @_
+contextual_diag(@_) => @_
 ```
 
 By plugging in the context where you want to know, indicate what the context:
 
 ```perl
 # CASE: wanted LIST context
-my @t = contexual_diag qw/a b/
-my @t = ('a','b', contexual_diag())
+my @t = contextual_diag qw/a b/
+my @t = ('a','b', contextual_diag())
 
 # CASE: wanted SCALAR context
-my $t = contexual_diag "hello"
-scalar contexual_diag qw/a b/
+my $t = contextual_diag "hello"
+scalar contextual_diag qw/a b/
 ```
 
 # LICENSE
