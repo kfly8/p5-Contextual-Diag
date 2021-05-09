@@ -120,9 +120,28 @@ subtest 'evaluated as OBJREF' => sub {
         qr/^wanted SCALAR context/,
         qr/^scalar ref is evaluated as OBJREF/,
     ];
-    my $obj = bless {}, 'Some';
-    like( warnings { contextual_diag()->can('somemethod') }, $expected );
-    like( warnings { contextual_diag($obj)->can('somemethod') }, $expected );
+
+    {
+        package Foo;
+        sub new {
+            my $class = shift;
+            return bless {}, $class
+        };
+
+        sub hello {
+            my ($self, $message) = @_;
+            return "hello $message"
+        }
+    }
+
+    my $obj = Foo->new;
+    like( warnings { ok !contextual_diag()->can('somemethod') }, $expected );
+    like( warnings { ok !contextual_diag()->isa('Some') }, $expected );
+    like( warnings { ok !contextual_diag($obj)->can('somemethod') }, $expected );
+    like( warnings { ok contextual_diag($obj)->can('new') }, $expected );
+    like( warnings { ok !contextual_diag($obj)->isa('Hoge') }, $expected );
+    like( warnings { ok contextual_diag($obj)->isa('Foo') }, $expected );
+    like( warnings { is contextual_diag($obj)->hello('world'), 'hello world' }, $expected );
 };
 
 done_testing;
