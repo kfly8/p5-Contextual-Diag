@@ -8,6 +8,7 @@ our $VERSION = "0.02";
 use Scalar::Util ();
 
 my %DATA;
+my %OVERLOAD;
 
 sub new {
     my ($class, $value, %overload) = @_;
@@ -22,30 +23,34 @@ sub new {
     return $self;
 }
 
-sub _gen_overload {
-    my $context = shift;
+BEGIN {
+    my %CONTEXT_MAP = (
+        q{""}  => 'STR',
+        '0+'   => 'NUM',
+        'bool' => 'BOOL',
+        '${}'  => 'SCALARREF',
+        '@{}'  => 'ARRAYREF',
+        '&{}'  => 'CODEREF',
+        '%{}'  => 'HASHREF',
+        '*{}'  => 'GLOBREF',
+    );
 
-    return sub {
-        my $self = shift;
+    %OVERLOAD = map {
+        my $context = $CONTEXT_MAP{$_};
 
-        my $id    = Scalar::Util::refaddr $self;
-        my $data  = $DATA{$id};
-        my $code  = $data->{overload}->{$context};
-        my $value = $data->{value};
-        return $code->($value);
-    }
+        $_ => sub {
+            my $self = shift;
+
+            my $id    = Scalar::Util::refaddr $self;
+            my $data  = $DATA{$id};
+            my $code  = $data->{overload}->{$context};
+            my $value = $data->{value};
+            return $code->($value);
+        }
+    } keys %CONTEXT_MAP,
 }
 
-use overload 
-    q{""}    => _gen_overload('STR'),
-    '0+'     => _gen_overload('NUM'),
-    'bool'   => _gen_overload('BOOL'),
-    '${}'    => _gen_overload('SCALARREF'),
-    '@{}'    => _gen_overload('ARRAYREF'),
-    '&{}'    => _gen_overload('CODEREF'),
-    '%{}'    => _gen_overload('HASHREF'),
-    '*{}'    => _gen_overload('GLOBREF'),
-    fallback => 1;
+use overload %OVERLOAD, fallback => 1;
 
 sub can {
     my ($invocant) = @_;
