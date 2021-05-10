@@ -43,7 +43,6 @@
       "runtime" : {
          "requires" : {
             "Carp" : "0",
-            "Contextual::Return" : "0.004014",
             "Exporter" : "0",
             "perl" : "5.010001"
          }
@@ -66,7 +65,7 @@
          "web" : "https://github.com/kfly8/p5-Contextual-Diag"
       }
    },
-   "version" : "0.02",
+   "version" : "0.03",
    "x_authority" : "cpan:KFLY",
    "x_serialization_backend" : "JSON::PP version 4.04",
    "x_static_install" : 1
