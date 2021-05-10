@@ -1,7 +1,6 @@
 requires 'perl', '5.010001';
 
 requires 'Exporter';
-requires 'Contextual::Return', '0.004014';
 requires 'Carp';
 
 on 'configure' => sub {

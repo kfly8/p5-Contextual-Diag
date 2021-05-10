@@ -9,34 +9,34 @@ use Exporter;
 our @ISA = qw/Exporter/;
 our @EXPORT = qw/contextual_diag/;
 
-use Contextual::Return;
 use Carp ();
+use Contextual::Diag::Value;
 
 sub contextual_diag {
 
-    # XXX: SCALAR block is lazy.
-    # https://metacpan.org/pod/Contextual%3A%3AReturn#Lazy-contextual-return-values
-    if (defined wantarray && !wantarray) {
-        _diag('wanted SCALAR context');
+    if (wantarray) {
+        _diag('wanted LIST context');
+        return @_;
     }
+    elsif(!defined wantarray) {
+        _diag('wanted VOID context');
+        return;
+    }
+    else {
+        _diag('wanted SCALAR context');
 
-    return
-        VOID     { _diag('wanted VOID context'); @_ }
-        LIST     { _diag('wanted LIST context'); @_ }
-
-        # Scalar Value
-        BOOL     { _diag('evaluated as BOOL in SCALAR context'); $_[0] }
-        NUM      { _diag('evaluated as NUM in SCALAR context');  $_[0] || 0   }
-        STR      { _diag('evaluated as STR in SCALAR context');  $_[0] || ""  }
-
-        # Scalar Reference
-        SCALARREF { _diag('scalar ref is evaluated as SCALARREF'); defined $_[0] ? $_[0] : \"" }
-        ARRAYREF  { _diag('scalar ref is evaluated as ARRAYREF');  defined $_[0] ? $_[0] : [] }
-        HASHREF   { _diag('scalar ref is evaluated as HASHREF');   defined $_[0] ? $_[0] : {} }
-        CODEREF   { _diag('scalar ref is evaluated as CODEREF');   defined $_[0] ? $_[0] : sub { } }
-        GLOBREF   { _diag('scalar ref is evaluated as GLOBREF');   defined $_[0] ? $_[0] : do { no strict qw/refs/; my $package = __PACKAGE__; \*{$package} } }
-        OBJREF    { _diag('scalar ref is evaluated as OBJREF');    defined $_[0] ? $_[0] : bless {}, __PACKAGE__ }
-    ;
+        return Contextual::Diag::Value->new($_[0],
+            BOOL      => sub { _diag('evaluated as BOOL in SCALAR context');  return $_[0] },
+            NUM       => sub { _diag('evaluated as NUM in SCALAR context');   return $_[0] || 0   },
+            STR       => sub { _diag('evaluated as STR in SCALAR context');   return $_[0] || ""  },
+            SCALARREF => sub { _diag('scalar ref is evaluated as SCALARREF'); return defined $_[0] ? $_[0] : \"" },
+            ARRAYREF  => sub { _diag('scalar ref is evaluated as ARRAYREF');  return defined $_[0] ? $_[0] : [] },
+            HASHREF   => sub { _diag('scalar ref is evaluated as HASHREF');   return defined $_[0] ? $_[0] : {} },
+            CODEREF   => sub { _diag('scalar ref is evaluated as CODEREF');   return defined $_[0] ? $_[0] : sub { } },
+            GLOBREF   => sub { _diag('scalar ref is evaluated as GLOBREF');   return defined $_[0] ? $_[0] : do { no strict qw/refs/; my $package = __PACKAGE__; \*{$package} } },
+            OBJREF    => sub { _diag('scalar ref is evaluated as OBJREF');    return defined $_[0] ? $_[0] : bless {}, __PACKAGE__ },
+        );
+    }
 }
 
 sub _diag {
