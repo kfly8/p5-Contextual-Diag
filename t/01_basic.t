@@ -144,4 +144,12 @@ subtest 'evaluated as OBJREF' => sub {
     like( warnings { is contextual_diag($obj)->hello('world'), 'hello world' }, $expected );
 };
 
+subtest 'override can/isa' => sub {
+    ok(Contextual::Diag::Value->can('new'));
+    ok(!Contextual::Diag::Value->can('hoge'));
+    ok(Contextual::Diag::Value->isa('Contextual::Diag::Value'));
+    ok(Contextual::Diag::Value->isa('UNIVERSAL'));
+    ok(!Contextual::Diag::Value->isa('Hoge'));
+};
+
 done_testing;

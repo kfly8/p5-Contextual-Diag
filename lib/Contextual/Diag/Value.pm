@@ -17,7 +17,7 @@ sub new {
     my $self = bless \my $scalar => $class;
     my $id = Scalar::Util::refaddr $self;
     $DATA{$id} = {
-        value => $value,
+        value    => $value,
         overload => \%overload,
     };
     return $self;
@@ -79,8 +79,7 @@ sub AUTOLOAD {
         my $data  = $DATA{$id};
         my $code  = $data->{overload}->{OBJREF};
         my $value = $data->{value};
-        my $obj   = $code->($value);
-        $obj;
+        $code->($value);
     };
 
     my ($method) = $AUTOLOAD =~ m{ .* :: (.*) }xms ? $1 : $AUTOLOAD;
@@ -89,9 +88,72 @@ sub AUTOLOAD {
 
 sub DESTROY {
     my $self = shift;
-    my $id    = Scalar::Util::refaddr $self;
+    my $id   = Scalar::Util::refaddr $self;
     delete $DATA{$id};
     return;
 }
 
 1;
+__END__
+
+=encoding utf-8
+
+=head1 NAME
+
+Contextual::Diag::Value - wrapping scalar value for diagnostics
+
+=head1 SYNOPSIS
+
+    use Contextual::Diag::Value;
+
+    my $value = 'hello';
+    my $v = Contextual::Diag::Value->new($value,
+        BOOL => sub { warn 'evaluated as BOOL';  return $_[0] },
+    );
+
+    if ($v) { }
+    # => warn 'evaluated as BOOL';
+
+=head2 new($value, %overload)
+
+Constructor for Contextual::Diag::Value:
+
+    Contextual::Diag::Value->new($_[0],
+        BOOL      => sub { $_[0] },
+        NUM       => sub { $_[0] || 0   },
+        STR       => sub { $_[0] || ""  },
+        SCALARREF => sub { defined $_[0] ? $_[0] : \"" },
+        ARRAYREF  => sub { defined $_[0] ? $_[0] : [] },
+        HASHREF   => sub { defined $_[0] ? $_[0] : {} },
+        CODEREF   => sub { defined $_[0] ? $_[0] : sub { } },
+        GLOBREF   => sub { defined $_[0] ? $_[0] : do { no strict qw/refs/; my $package = __PACKAGE__; \*{$package} } },
+        OBJREF    => sub { defined $_[0] ? $_[0] : bless {}, __PACKAGE__ },
+    );
+
+=head2 OTHER METHODS
+
+=head3 can
+
+Override C<can> to hook OBJREF.
+
+=head3 isa
+
+Override C<isa> to hook OBJREF.
+
+=head1 SEE ALSO
+
+L<Contextual::Return>
+
+=head1 LICENSE
+
+Copyright (C) kfly8.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
+=head1 AUTHOR
+
+kfly8 E<lt>kfly@cpan.orgE<gt>
+
+=cut
+
