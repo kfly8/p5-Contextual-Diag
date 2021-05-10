@@ -150,6 +150,10 @@ subtest 'override can/isa' => sub {
     ok(Contextual::Diag::Value->isa('Contextual::Diag::Value'));
     ok(Contextual::Diag::Value->isa('UNIVERSAL'));
     ok(!Contextual::Diag::Value->isa('Hoge'));
+
+    like dies {
+        Contextual::Diag::Value->hoge;
+    }, qr/cannot AUTOLOAD in class call/;
 };
 
 done_testing;

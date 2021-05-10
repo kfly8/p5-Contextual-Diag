@@ -74,8 +74,12 @@ sub AUTOLOAD {
     my $self = shift;
     our $AUTOLOAD;
 
+    unless (ref $self) {
+        die "cannot AUTOLOAD in class call"
+    }
+
     my $obj = do {
-        my $id    = Scalar::Util::refaddr $self;
+        my $id = Scalar::Util::refaddr $self;
         my $data  = $DATA{$id};
         my $code  = $data->{overload}->{OBJREF};
         my $value = $data->{value};
