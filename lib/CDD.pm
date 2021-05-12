@@ -5,11 +5,13 @@ use warnings;
 
 our $VERSION = "0.03";
 
-use Contextual::Diag;
+use Contextual::Diag ();
+
+use Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(cdd);
 
-*cdd = *contextual_diag;
+*cdd = *Contextual::Diag::contextual_diag;
 
 1;
 __END__
