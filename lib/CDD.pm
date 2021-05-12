@@ -1,0 +1,38 @@
+package CDD;
+use 5.010;
+use strict;
+use warnings;
+
+our $VERSION = "0.03";
+
+use Contextual::Diag;
+our @ISA = qw(Exporter);
+our @EXPORT = qw(cdd);
+
+*cdd = *contextual_diag;
+
+1;
+__END__
+
+=head1 NAME
+
+CDD - Contextual::Diag shortcut for faster debugging
+
+=head1 SYNOPSIS
+
+    use CDD;
+
+    if (cdd) { }
+    # => warn "evaluated as BOOL in SCALAR context"
+
+=head1 DESCRIPTION
+
+Tired of typing C<use Contextual::Diag> every time? C<CDD> lets you quickly call!
+
+It behaves exactly like L<Contextual::Diag> - it is, indeed, just an alias to it :)
+
+Happy debugging!
+
+=head1 SEE ALSO
+
+L<Contextual::Diag>
