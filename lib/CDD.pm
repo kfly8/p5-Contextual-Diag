@@ -31,8 +31,6 @@ CDD - Contextual::Diag shortcut for faster debugging
 
 Tired of typing C<use Contextual::Diag> every time? C<CDD> lets you quickly call!
 
-It behaves exactly like L<Contextual::Diag> - it is, indeed, just an alias to it :)
-
 Happy debugging!
 
 =head1 SEE ALSO
