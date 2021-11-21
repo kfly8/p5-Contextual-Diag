@@ -50,7 +50,7 @@ subtest 'SCALAR as STR' => sub {
     ];
 
     like( warnings { ok "hello" ne contextual_diag }, $expected );
-    like( warnings { ok "hello" eq contextual_diag "hello" }, $expected );
+    like( warnings { ok "" eq contextual_diag }, $expected );
     like( warnings { length contextual_diag() }, $expected );
 };
 
@@ -61,7 +61,7 @@ subtest 'SCALAR as NUM' => sub {
     ];
 
     like( warnings { ok 1 != contextual_diag }, $expected );
-    like( warnings { ok 1 == contextual_diag 1 }, $expected );
+    like( warnings { ok 0 == contextual_diag }, $expected );
 };
 
 subtest 'evaluated as SCALARREF' => sub {
@@ -122,27 +122,8 @@ subtest 'evaluated as OBJREF' => sub {
         qr/^scalar ref is evaluated as OBJREF/,
     ];
 
-    {
-        package Foo;
-        sub new {
-            my $class = shift;
-            return bless {}, $class
-        };
-
-        sub hello {
-            my ($self, $message) = @_;
-            return "hello $message"
-        }
-    }
-
-    my $obj = Foo->new;
     like( warnings { ok !contextual_diag()->can('somemethod') }, $expected );
     like( warnings { ok !contextual_diag()->isa('Some') }, $expected );
-    like( warnings { ok !contextual_diag($obj)->can('somemethod') }, $expected );
-    like( warnings { ok contextual_diag($obj)->can('new') }, $expected );
-    like( warnings { ok !contextual_diag($obj)->isa('Hoge') }, $expected );
-    like( warnings { ok contextual_diag($obj)->isa('Foo') }, $expected );
-    like( warnings { is contextual_diag($obj)->hello('world'), 'hello world' }, $expected );
 };
 
 subtest 'override can/isa' => sub {
@@ -161,6 +142,20 @@ subtest 'cdd' => sub {
     like( warnings { cdd }, [qr/^wanted VOID context/] );
     like( warnings { my @t = cdd }, [qr/^wanted LIST context/] );
     like( warnings { my $t = cdd }, [qr/^wanted SCALAR context/ ] );
+};
+
+subtest 'no return value' => sub {
+    like warnings {
+        my $a = cdd('hello');
+        is $a, '';
+
+        my @a = cdd('hello', 'world');
+        is \@a, [];
+    }, [
+        qr/^wanted SCALAR context/,
+        qr/^evaluated as STR in SCALAR context/,
+        qr/^wanted LIST context/,
+    ]
 };
 
 done_testing;
