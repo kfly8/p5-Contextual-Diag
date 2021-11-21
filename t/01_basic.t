@@ -144,4 +144,18 @@ subtest 'cdd' => sub {
     like( warnings { my $t = cdd }, [qr/^wanted SCALAR context/ ] );
 };
 
+subtest 'no return value' => sub {
+    like warnings {
+        my $a = cdd('hello');
+        is $a, '';
+
+        my @a = cdd('hello', 'world');
+        is \@a, [];
+    }, [
+        qr/^wanted SCALAR context/,
+        qr/^evaluated as STR in SCALAR context/,
+        qr/^wanted LIST context/,
+    ]
+};
+
 done_testing;
